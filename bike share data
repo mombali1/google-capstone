@@ -1,6 +1,6 @@
 SELECT * FROM BikeTripData..Divy4MonthData
 
--- STANDARDIZE COLUMN TYPES TO ALLOW FOR TABLE UNIONIZATION
+-- STANDARDIZE COLUMN TYPES TO ALLOW FOR TABLE UNIONIZATION----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ALTER TABLE BikeTripData..divy2101
 ALTER COLUMN start_station_id nvarchar(255)
@@ -35,7 +35,7 @@ FROM (SELECT * FROM divy2101
 SELECT COUNT(1)
 FROM Divy4MonthData
 
--- CALCULATE AND ADD RIDE TIME COLUMN
+-- CALCULATE AND ADD RIDE TIME COLUMN----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALTER TABLE Divy4MonthData
 ADD RideTime int
 
@@ -43,7 +43,7 @@ UPDATE Divy4MonthData
 SET RideTime=(SELECT(DATEDIFF(MI, started_at, ended_at))) 
 
 
---combine lat and long data to create start and end coordiantes columns
+--combine lat and long data to create start and end coordiantes columns----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ALTER TABLE biketripdata..divy4monthdata
 ADD start_coordinates GEOGRAPHY
@@ -58,7 +58,7 @@ UPDATE biketripdata..divy4monthdata
 SET end_coordinates = geography::Point(end_lat, end_lng, 4326)
 where end_lat is not null and end_lng is not null
 
--- add column to exclude rows not suitable for querying
+-- add column to exclude rows not suitable for querying----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALTER TABLE
 ADD Exclude nvarhar
   
@@ -88,7 +88,7 @@ update BikeTripData..Divy4MonthData
 SET Exclude = 'x' 
 where  start_station_name is null or end_station_name is null
 
--- will use station names as refrence as there are more empty stationid
+-- will use station names as refrence as there are more empty stationid----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 SELECT * 
 FROM BikeTripData..Divy4MonthData
@@ -103,7 +103,7 @@ WHERE ended_at is null
 
 
 
--- temp table for queries
+-- temp table for queries----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 WITH query_data as ( 
 	SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual, ridetime, exclude, start_coordinates, end_coordinates
@@ -113,9 +113,9 @@ WITH query_data as (
 )
 SELECT *  FROM QUERY_DATA;
 
---queries for visualization
+--queries for visualization----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- avg trip length by membertype
+-- avg trip length by membertype----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 WITH query_data as ( 
 		SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual, ridetime, exclude, start_coordinates, end_coordinates
@@ -128,7 +128,7 @@ FROM query_data
 GROUP BY  member_casual
 
 
- -- count of trips in ranges of 20 mins
+ -- count of trips in ranges of 20 mins----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  	
 	
 	WITH query_data as ( 
@@ -159,7 +159,7 @@ SELECT member_casual,
 			group by triprange, member_casual
 			order by trips desc;
 
---trips per member type
+--trips per member type----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 WITH query_data as ( 
 		SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual, ridetime, exclude, start_coordinates, end_coordinates
@@ -170,7 +170,7 @@ WITH query_data as (
 			from query_data
 			group by member_casual;
 
---trips by member type per month
+--trips by member type per month----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 WITH query_data as ( 
 		SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual, ridetime, exclude, start_coordinates, end_coordinates
@@ -182,7 +182,7 @@ WITH query_data as (
 			group by  DATEPART(month,started_at), member_casual
 			order by TripCount;
 
---trips by member type per day of week
+--trips by member type per day of week----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 WITH query_data as ( 
 		SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual, ridetime, exclude, start_coordinates, end_coordinates
@@ -194,7 +194,7 @@ WITH query_data as (
 			group by datepart(weekday, started_at), member_casual;
 
 
--- trips by member type per hour of day
+-- trips by member type per hour of day----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 WITH query_data as ( 
 		SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual, ridetime, exclude, start_coordinates, end_coordinates
@@ -205,7 +205,7 @@ WITH query_data as (
 			from query_data
 			group by datepart(hour, started_at), member_casual;
 
---TOP 5 MOST POPULAR START STATIONS per member member type
+--TOP 5 MOST POPULAR START STATIONS per member member type----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 WITH query_data as ( 
 		SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual, ridetime, exclude, start_coordinates, end_coordinates
@@ -218,7 +218,7 @@ WITH query_data as (
 		GROUP BY  member_casual, start_station_name
 		ORDER BY TripCount desc
 
---TOP 5 MOST POPULAR START STATIONS per casual member type
+--TOP 5 MOST POPULAR START STATIONS per casual member type---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 WITH query_data as ( 
 		SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual, ridetime, exclude, start_coordinates, end_coordinates
@@ -232,7 +232,7 @@ WITH query_data as (
 		ORDER BY TripCount desc;
 
 
--- top 5 most popular routes by member
+-- top 5 most popular routes by member-----------------------------------------------------------------------------------------------------------------------------------------------
 
 
 WITH query_data as ( 
@@ -247,7 +247,7 @@ WITH query_data as (
 		order by RouteTrips desc
 
 
--- top 5 most popular routes by casual member
+-- top 5 most popular routes by casual member------------------------------------------------------------------------------------------------------------------------------------
 
 
 WITH query_data as ( 
@@ -263,7 +263,7 @@ WITH query_data as (
 
 
 
--- avg bike ride time, and num of trips, per bike type per membertype
+-- avg bike ride time, and num of trips, per bike type per membertype----------------------------------------------------------------------------------------------------------
 
 WITH query_data as ( 
 		SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, end_station_name, member_casual, ridetime, exclude, start_coordinates, end_coordinates
@@ -320,7 +320,7 @@ SELECT top 900000 *
 FROM BikeTripData..Divy4MonthData
 WHERE exclude is null
 
--- calculate avg ride time and number of trips per route
+-- calculate avg ride time and number of trips per route-------------------------------------------------------------------------------------------------------------------
 
 
 SELECT ROUTE, AVG(RIDETIME) AvgRideTime, COUNT(1) TRIPS
